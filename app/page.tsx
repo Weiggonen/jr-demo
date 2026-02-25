@@ -1,4 +1,11 @@
+"use client";
+
 import Image from "next/image";
+import { useState, useEffect } from "react";
+
+const LOADING_MS = 5000;
+const STAGGER_MS = 350;
+const TOTAL_SECTIONS = 9;
 
 const dealers = [
   { name: "K AUTO RETAIL OY", price: "12 870 €", days: 16, highlight: false },
@@ -67,7 +74,66 @@ function StatCard({ label, value }: { label: string; value: string }) {
   );
 }
 
+function RevealSection({ visible, children }: { visible: boolean; children: React.ReactNode }) {
+  return (
+    <div
+      className={`transition-all duration-500 ease-out ${
+        visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4 pointer-events-none"
+      }`}
+    >
+      {children}
+    </div>
+  );
+}
+
+function LoadingSpinner() {
+  return (
+    <div className="flex-1 flex flex-col items-center justify-center gap-5 px-6">
+      <div className="relative flex items-center justify-center">
+        <div className="absolute h-16 w-16 rounded-full border-[3px] border-red-200 border-t-red-600 animate-spin" />
+        <svg className="h-7 w-7 text-red-700" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M5 17h1a2 2 0 002-2v-1h8v1a2 2 0 002 2h1" />
+          <path d="M3 11l1.5-5A2 2 0 016.4 4.5h11.2a2 2 0 011.9 1.5L21 11" />
+          <rect x="3" y="11" width="18" height="6" rx="2" />
+          <circle cx="6.5" cy="17" r="1.5" />
+          <circle cx="17.5" cy="17" r="1.5" />
+        </svg>
+      </div>
+      <div className="text-center">
+        <p className="text-sm font-semibold text-gray-700">Tunnistetaan autoa…</p>
+        <p className="text-xs text-gray-400 mt-1">Haetaan tietoja järjestelmistä</p>
+      </div>
+      <div className="flex gap-1.5 mt-1">
+        <span className="h-1.5 w-1.5 rounded-full bg-red-600 animate-bounce [animation-delay:0ms]" />
+        <span className="h-1.5 w-1.5 rounded-full bg-red-600 animate-bounce [animation-delay:150ms]" />
+        <span className="h-1.5 w-1.5 rounded-full bg-red-600 animate-bounce [animation-delay:300ms]" />
+      </div>
+    </div>
+  );
+}
+
 export default function Home() {
+  const [loading, setLoading] = useState(true);
+  const [revealed, setRevealed] = useState(0);
+
+  useEffect(() => {
+    const t = setTimeout(() => setLoading(false), LOADING_MS);
+    return () => clearTimeout(t);
+  }, []);
+
+  useEffect(() => {
+    if (loading) return;
+    let n = 0;
+    const iv = setInterval(() => {
+      n++;
+      setRevealed(n);
+      if (n >= TOTAL_SECTIONS) clearInterval(iv);
+    }, STAGGER_MS);
+    return () => clearInterval(iv);
+  }, [loading]);
+
+  const show = (i: number) => revealed >= i;
+
   return (
     <div className="flex h-screen overflow-hidden bg-gray-100">
       {/* Left: Screenshot */}
@@ -98,7 +164,11 @@ export default function Home() {
             </div>
           </div>
           {/* Key points */}
-          <div className="flex border-t border-red-600/50">
+          <div
+            className={`flex border-t border-red-600/50 overflow-hidden transition-all duration-500 ease-out ${
+              show(1) ? "max-h-20 opacity-100" : "max-h-0 opacity-0"
+            }`}
+          >
             <div className="flex-1 px-3 py-2 text-center border-r border-red-600/50">
               <div className="text-[10px] text-red-200 uppercase tracking-wide">Tinkivara</div>
               <div className="text-base font-bold text-white">800 €</div>
@@ -110,127 +180,122 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Scrollable content */}
-        <div className="flex-1 overflow-y-auto px-4 py-4 space-y-5">
-          {/* CarVertical / CARfax */}
-          <div>
-            <SectionTitle>Historiatarkistus</SectionTitle>
-            <div className="space-y-1.5">
-              <CheckBadge text="CarVertical – Ei huomioita" />
-              <CheckBadge text="CARfax – Ei huomioita" />
-            </div>
-          </div>
-
-          {/* Pisteet */}
-          <div>
-            <SectionTitle>Pisteet</SectionTitle>
-            <div className="space-y-1.5">
-              <ScoreBadge label="Myyntipisteet" value="12 %" score={12} />
-              <ScoreBadge label="KM-pisteet" value="0 %" score={0} />
-            </div>
-          </div>
-
-          {/* Muut autoliikkeet */}
-          <div>
-            <SectionTitle>Markkinatilanne</SectionTitle>
-            <div className="rounded-lg border border-gray-200 overflow-hidden">
-              <table className="w-full text-xs">
-                <thead>
-                  <tr className="bg-gray-50 text-left text-gray-500">
-                    <th className="px-2.5 py-2 font-medium">Autoliike</th>
-                    <th className="px-2.5 py-2 font-medium text-right">Hinta</th>
-                    <th className="px-2.5 py-2 font-medium text-right">Pv</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {dealers.map((d, i) => (
-                    <tr
-                      key={i}
-                      className={
-                        d.highlight
-                          ? "bg-red-50 font-semibold text-red-800 border-l-2 border-red-500"
-                          : i % 2 === 0
-                            ? "bg-white"
-                            : "bg-gray-50/50"
-                      }
-                    >
-                      <td className="px-2.5 py-1.5 truncate max-w-[140px]">
-                        {d.name}
-                        {d.highlight && (
-                          <span className="ml-1 text-[9px] text-red-500 font-normal">(sinä)</span>
-                        )}
-                      </td>
-                      <td className="px-2.5 py-1.5 text-right whitespace-nowrap">{d.price}</td>
-                      <td className="px-2.5 py-1.5 text-right whitespace-nowrap">{d.days}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-
-          {/* Tyyppiviat & Trafi */}
-          <div>
-            <SectionTitle>Tyyppiviat & Trafitiedot</SectionTitle>
-            <CheckBadge text="Ei huomioita" />
-          </div>
-
-          {/* Tunnusluvut */}
-          <div>
-            <SectionTitle>Tunnusluvut</SectionTitle>
-            <div className="flex gap-2.5">
-              <StatCard label="Keskiarvokate" value="972 €" />
-              <StatCard label="Keskim. varastopäivät" value="49 pv" />
-            </div>
-          </div>
-
-          {/* Top 3 myyntiargumenttia */}
-          <div>
-            <SectionTitle>Top 3 myyntiargumenttia</SectionTitle>
-            <div className="space-y-1.5">
-              {sellingPoints.map((point, i) => (
-                <div key={i} className="flex items-start gap-2 rounded-lg bg-emerald-50 px-3 py-2 text-sm text-emerald-800 border border-emerald-100">
-                  <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-emerald-500 text-[10px] font-bold text-white">
-                    {i + 1}
-                  </span>
-                  {point}
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Top 3 vaihtoautot */}
-          <div>
-            <SectionTitle>Top 3 halutut vaihtoautot</SectionTitle>
-            <div className="space-y-1.5">
-              {tradeIns.map((car, i) => (
-                <div key={i} className="flex items-center gap-2 rounded-lg bg-amber-50 px-3 py-2 text-sm text-amber-800 border border-amber-100">
-                  <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-amber-500 text-[10px] font-bold text-white">
-                    {i + 1}
-                  </span>
-                  {car}
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Edistyneet suositukset */}
-          <div>
-            <SectionTitle>Edistyneet suositukset</SectionTitle>
-            <div className="rounded-lg bg-red-50 p-3 border border-red-200">
-              <div className="flex items-start gap-2">
-                <svg className="h-5 w-5 shrink-0 text-red-500 mt-0.5" viewBox="0 0 20 20" fill="currentColor">
-                  <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a.75.75 0 000 1.5h.253a.25.25 0 01.244.304l-.459 2.066A1.75 1.75 0 0010.747 15H11a.75.75 0 000-1.5h-.253a.25.25 0 01-.244-.304l.459-2.066A1.75 1.75 0 009.253 9H9z" clipRule="evenodd" />
-                </svg>
-                <p className="text-sm text-red-800 leading-relaxed">
-                  Voit tulla hinnassa vastaan <strong>maksimissaan 800 €</strong>.
-                  Tämä auto keskimäärin lojuu varastossa liian kauan, ja tuolla
-                  hinnalla päästäisiin vielä pienelle katteelle tästä autosta.
-                </p>
+        {loading ? (
+          <LoadingSpinner />
+        ) : (
+          <div className="flex-1 overflow-y-auto px-4 py-4 space-y-5">
+            <RevealSection visible={show(2)}>
+              <SectionTitle>Historiatarkistus</SectionTitle>
+              <div className="space-y-1.5">
+                <CheckBadge text="CarVertical – Ei huomioita" />
+                <CheckBadge text="CARfax – Ei huomioita" />
               </div>
-            </div>
+            </RevealSection>
+
+            <RevealSection visible={show(3)}>
+              <SectionTitle>Pisteet</SectionTitle>
+              <div className="space-y-1.5">
+                <ScoreBadge label="Myyntipisteet" value="12 %" score={12} />
+                <ScoreBadge label="KM-pisteet" value="0 %" score={0} />
+              </div>
+            </RevealSection>
+
+            <RevealSection visible={show(4)}>
+              <SectionTitle>Markkinatilanne</SectionTitle>
+              <div className="rounded-lg border border-gray-200 overflow-hidden">
+                <table className="w-full text-xs">
+                  <thead>
+                    <tr className="bg-gray-50 text-left text-gray-500">
+                      <th className="px-2.5 py-2 font-medium">Autoliike</th>
+                      <th className="px-2.5 py-2 font-medium text-right">Hinta</th>
+                      <th className="px-2.5 py-2 font-medium text-right">Pv</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {dealers.map((d, i) => (
+                      <tr
+                        key={i}
+                        className={
+                          d.highlight
+                            ? "bg-red-50 font-semibold text-red-800 border-l-2 border-red-500"
+                            : i % 2 === 0
+                              ? "bg-white"
+                              : "bg-gray-50/50"
+                        }
+                      >
+                        <td className="px-2.5 py-1.5 truncate max-w-[140px]">
+                          {d.name}
+                          {d.highlight && (
+                            <span className="ml-1 text-[9px] text-red-500 font-normal">(sinä)</span>
+                          )}
+                        </td>
+                        <td className="px-2.5 py-1.5 text-right whitespace-nowrap">{d.price}</td>
+                        <td className="px-2.5 py-1.5 text-right whitespace-nowrap">{d.days}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </RevealSection>
+
+            <RevealSection visible={show(5)}>
+              <SectionTitle>Tyyppiviat & Trafitiedot</SectionTitle>
+              <CheckBadge text="Ei huomioita" />
+            </RevealSection>
+
+            <RevealSection visible={show(6)}>
+              <SectionTitle>Tunnusluvut</SectionTitle>
+              <div className="flex gap-2.5">
+                <StatCard label="Keskiarvokate" value="972 €" />
+                <StatCard label="Keskim. varastopäivät" value="49 pv" />
+              </div>
+            </RevealSection>
+
+            <RevealSection visible={show(7)}>
+              <SectionTitle>Top 3 myyntiargumenttia</SectionTitle>
+              <div className="space-y-1.5">
+                {sellingPoints.map((point, i) => (
+                  <div key={i} className="flex items-start gap-2 rounded-lg bg-emerald-50 px-3 py-2 text-sm text-emerald-800 border border-emerald-100">
+                    <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-emerald-500 text-[10px] font-bold text-white">
+                      {i + 1}
+                    </span>
+                    {point}
+                  </div>
+                ))}
+              </div>
+            </RevealSection>
+
+            <RevealSection visible={show(8)}>
+              <SectionTitle>Top 3 halutut vaihtoautot</SectionTitle>
+              <div className="space-y-1.5">
+                {tradeIns.map((car, i) => (
+                  <div key={i} className="flex items-center gap-2 rounded-lg bg-amber-50 px-3 py-2 text-sm text-amber-800 border border-amber-100">
+                    <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-amber-500 text-[10px] font-bold text-white">
+                      {i + 1}
+                    </span>
+                    {car}
+                  </div>
+                ))}
+              </div>
+            </RevealSection>
+
+            <RevealSection visible={show(9)}>
+              <SectionTitle>Edistyneet suositukset</SectionTitle>
+              <div className="rounded-lg bg-red-50 p-3 border border-red-200">
+                <div className="flex items-start gap-2">
+                  <svg className="h-5 w-5 shrink-0 text-red-500 mt-0.5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a.75.75 0 000 1.5h.253a.25.25 0 01.244.304l-.459 2.066A1.75 1.75 0 0010.747 15H11a.75.75 0 000-1.5h-.253a.25.25 0 01-.244-.304l.459-2.066A1.75 1.75 0 009.253 9H9z" clipRule="evenodd" />
+                  </svg>
+                  <p className="text-sm text-red-800 leading-relaxed">
+                    Voit tulla hinnassa vastaan <strong>maksimissaan 800 €</strong>.
+                    Tämä auto keskimäärin lojuu varastossa liian kauan, ja tuolla
+                    hinnalla päästäisiin vielä pienelle katteelle tästä autosta.
+                  </p>
+                </div>
+              </div>
+            </RevealSection>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );
