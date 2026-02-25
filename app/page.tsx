@@ -39,11 +39,21 @@ function SectionTitle({ children }: { children: React.ReactNode }) {
   );
 }
 
-function ScoreBadge({ label, value, color }: { label: string; value: string; color: string }) {
+function ScoreBadge({ label, value, score }: { label: string; value: string; score: number }) {
+  const light =
+    score >= 70
+      ? { bg: "bg-green-500", ring: "ring-green-200", text: "text-green-700" }
+      : score >= 30
+        ? { bg: "bg-yellow-400", ring: "ring-yellow-200", text: "text-yellow-700" }
+        : { bg: "bg-red-500", ring: "ring-red-200", text: "text-red-700" };
+
   return (
     <div className="flex items-center justify-between rounded-lg bg-gray-50 px-3 py-2.5 border border-gray-100">
       <span className="text-sm text-gray-600">{label}</span>
-      <span className={`text-sm font-bold ${color}`}>{value}</span>
+      <div className="flex items-center gap-2">
+        <span className={`text-sm font-bold ${light.text}`}>{value}</span>
+        <span className={`inline-block h-3 w-3 rounded-full ${light.bg} ring-2 ${light.ring}`} />
+      </div>
     </div>
   );
 }
@@ -115,8 +125,8 @@ export default function Home() {
           <div>
             <SectionTitle>Pisteet</SectionTitle>
             <div className="space-y-1.5">
-              <ScoreBadge label="Myyntipisteet" value="12 %" color="text-red-600" />
-              <ScoreBadge label="KM-pisteet" value="0 %" color="text-gray-400" />
+              <ScoreBadge label="Myyntipisteet" value="12 %" score={12} />
+              <ScoreBadge label="KM-pisteet" value="0 %" score={0} />
             </div>
           </div>
 
