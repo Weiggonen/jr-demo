@@ -1,65 +1,227 @@
 import Image from "next/image";
 
+const dealers = [
+  { name: "K AUTO RETAIL OY", price: "12 870 €", days: 16, highlight: false },
+  { name: "YR-AUTO OY", price: "13 600 €", days: 8, highlight: false },
+  { name: "K AUTO RETAIL OY", price: "13 800 €", days: 63, highlight: false },
+  { name: "JARMO RINTA-JOUPPI OY", price: "14 400 €", days: 114, highlight: true },
+  { name: "K AUTO RETAIL OY", price: "14 690 €", days: 30, highlight: false },
+  { name: "JARMO RINTA-JOUPPI OY", price: "14 800 €", days: 44, highlight: false },
+  { name: "SAKA FINLAND OY", price: "18 800 €", days: 43, highlight: false },
+  { name: "SAKA FINLAND OY", price: "19 800 €", days: 114, highlight: false },
+  { name: "KAMUX SUOMI OY", price: "23 900 €", days: 15, highlight: false },
+];
+
+const sellingPoints = [
+  "Suomiauto",
+  "Yhdeltä omistajalta",
+  "Kahdet hyväkuntoiset renkaat",
+];
+
+const tradeIns = ["Volvo XC60", "Tesla Model 3", "Toyota Avensis"];
+
+function CheckBadge({ text }: { text: string }) {
+  return (
+    <div className="flex items-center gap-2 rounded-lg bg-green-50 px-3 py-2 text-sm font-medium text-green-700 border border-green-200">
+      <svg className="h-4 w-4 shrink-0 text-green-500" viewBox="0 0 20 20" fill="currentColor">
+        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clipRule="evenodd" />
+      </svg>
+      {text}
+    </div>
+  );
+}
+
+function SectionTitle({ children }: { children: React.ReactNode }) {
+  return (
+    <h3 className="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-2">
+      {children}
+    </h3>
+  );
+}
+
+function ScoreBadge({ label, value, color }: { label: string; value: string; color: string }) {
+  return (
+    <div className="flex items-center justify-between rounded-lg bg-gray-50 px-3 py-2.5 border border-gray-100">
+      <span className="text-sm text-gray-600">{label}</span>
+      <span className={`text-sm font-bold ${color}`}>{value}</span>
+    </div>
+  );
+}
+
+function StatCard({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="flex-1 rounded-lg bg-gray-50 p-3 text-center border border-gray-100">
+      <div className="text-lg font-bold text-gray-900">{value}</div>
+      <div className="text-xs text-gray-500 mt-0.5">{label}</div>
+    </div>
+  );
+}
+
 export default function Home() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
+    <div className="flex h-screen overflow-hidden bg-gray-100">
+      {/* Left: Screenshot */}
+      <div className="w-[70%] overflow-auto bg-gray-200">
         <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
+          src="/image001.png"
+          alt="J. Rinta-Jouppi järjestelmä – Audi A4 (LNK-407)"
+          width={1866}
+          height={1568}
+          className="w-full h-auto"
           priority
         />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+      </div>
+
+      {/* Right: Extension Panel */}
+      <div className="w-[30%] flex flex-col border-l border-gray-300 bg-white shadow-[-2px_0_8px_rgba(0,0,0,0.06)]">
+        {/* Header */}
+        <div className="border-b border-gray-200 bg-gradient-to-r from-red-700 to-red-800">
+          <div className="flex items-center gap-2.5 px-4 py-3">
+            <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-white/20">
+              <svg className="h-4 w-4 text-white" viewBox="0 0 20 20" fill="currentColor">
+                <path d="M10.362 1.093a.75.75 0 00-.724 0L2.523 5.018 10 9.143l7.477-4.125-7.115-3.925zM18 6.443l-7.25 4v8.25l6.862-3.786A.75.75 0 0018 14.25V6.443zm-8.75 12.25v-8.25l-7.25-4v7.807a.75.75 0 00.388.657L9.25 18.693z" />
+              </svg>
+            </div>
+            <div>
+              <h1 className="text-sm font-bold text-white leading-tight">AutoAssist</h1>
+              <p className="text-[10px] text-red-200">Audi A4 · LNK-407</p>
+            </div>
+          </div>
+          {/* Key points */}
+          <div className="flex border-t border-red-600/50">
+            <div className="flex-1 px-3 py-2 text-center border-r border-red-600/50">
+              <div className="text-[10px] text-red-200 uppercase tracking-wide">Tinkivara</div>
+              <div className="text-base font-bold text-white">800 €</div>
+            </div>
+            <div className="flex-1 px-3 py-2 text-center">
+              <div className="text-[10px] text-red-200 uppercase tracking-wide">Kilpailijoiden alin</div>
+              <div className="text-base font-bold text-white">12 870 €</div>
+            </div>
+          </div>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+
+        {/* Scrollable content */}
+        <div className="flex-1 overflow-y-auto px-4 py-4 space-y-5">
+          {/* CarVertical / CARfax */}
+          <div>
+            <SectionTitle>Historiatarkistus</SectionTitle>
+            <div className="space-y-1.5">
+              <CheckBadge text="CarVertical – Ei huomioita" />
+              <CheckBadge text="CARfax – Ei huomioita" />
+            </div>
+          </div>
+
+          {/* Pisteet */}
+          <div>
+            <SectionTitle>Pisteet</SectionTitle>
+            <div className="space-y-1.5">
+              <ScoreBadge label="Myyntipisteet" value="12 %" color="text-red-600" />
+              <ScoreBadge label="KM-pisteet" value="0 %" color="text-gray-400" />
+            </div>
+          </div>
+
+          {/* Muut autoliikkeet */}
+          <div>
+            <SectionTitle>Markkinatilanne</SectionTitle>
+            <div className="rounded-lg border border-gray-200 overflow-hidden">
+              <table className="w-full text-xs">
+                <thead>
+                  <tr className="bg-gray-50 text-left text-gray-500">
+                    <th className="px-2.5 py-2 font-medium">Autoliike</th>
+                    <th className="px-2.5 py-2 font-medium text-right">Hinta</th>
+                    <th className="px-2.5 py-2 font-medium text-right">Pv</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {dealers.map((d, i) => (
+                    <tr
+                      key={i}
+                      className={
+                        d.highlight
+                          ? "bg-red-50 font-semibold text-red-800 border-l-2 border-red-500"
+                          : i % 2 === 0
+                            ? "bg-white"
+                            : "bg-gray-50/50"
+                      }
+                    >
+                      <td className="px-2.5 py-1.5 truncate max-w-[140px]">
+                        {d.name}
+                        {d.highlight && (
+                          <span className="ml-1 text-[9px] text-red-500 font-normal">(sinä)</span>
+                        )}
+                      </td>
+                      <td className="px-2.5 py-1.5 text-right whitespace-nowrap">{d.price}</td>
+                      <td className="px-2.5 py-1.5 text-right whitespace-nowrap">{d.days}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          {/* Tyyppiviat & Trafi */}
+          <div>
+            <SectionTitle>Tyyppiviat & Trafitiedot</SectionTitle>
+            <CheckBadge text="Ei huomioita" />
+          </div>
+
+          {/* Tunnusluvut */}
+          <div>
+            <SectionTitle>Tunnusluvut</SectionTitle>
+            <div className="flex gap-2.5">
+              <StatCard label="Keskiarvokate" value="972 €" />
+              <StatCard label="Keskim. varastopäivät" value="49 pv" />
+            </div>
+          </div>
+
+          {/* Top 3 myyntiargumenttia */}
+          <div>
+            <SectionTitle>Top 3 myyntiargumenttia</SectionTitle>
+            <div className="space-y-1.5">
+              {sellingPoints.map((point, i) => (
+                <div key={i} className="flex items-start gap-2 rounded-lg bg-emerald-50 px-3 py-2 text-sm text-emerald-800 border border-emerald-100">
+                  <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-emerald-500 text-[10px] font-bold text-white">
+                    {i + 1}
+                  </span>
+                  {point}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Top 3 vaihtoautot */}
+          <div>
+            <SectionTitle>Top 3 halutut vaihtoautot</SectionTitle>
+            <div className="space-y-1.5">
+              {tradeIns.map((car, i) => (
+                <div key={i} className="flex items-center gap-2 rounded-lg bg-amber-50 px-3 py-2 text-sm text-amber-800 border border-amber-100">
+                  <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-amber-500 text-[10px] font-bold text-white">
+                    {i + 1}
+                  </span>
+                  {car}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Edistyneet suositukset */}
+          <div>
+            <SectionTitle>Edistyneet suositukset</SectionTitle>
+            <div className="rounded-lg bg-red-50 p-3 border border-red-200">
+              <div className="flex items-start gap-2">
+                <svg className="h-5 w-5 shrink-0 text-red-500 mt-0.5" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a.75.75 0 000 1.5h.253a.25.25 0 01.244.304l-.459 2.066A1.75 1.75 0 0010.747 15H11a.75.75 0 000-1.5h-.253a.25.25 0 01-.244-.304l.459-2.066A1.75 1.75 0 009.253 9H9z" clipRule="evenodd" />
+                </svg>
+                <p className="text-sm text-red-800 leading-relaxed">
+                  Voit tulla hinnassa vastaan <strong>maksimissaan 800 €</strong>.
+                  Tämä auto keskimäärin lojuu varastossa liian kauan, ja tuolla
+                  hinnalla päästäisiin vielä pienelle katteelle tästä autosta.
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
-      </main>
+      </div>
     </div>
   );
 }
